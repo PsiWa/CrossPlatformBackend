@@ -20,7 +20,7 @@
     "Seregin_Backend": {
       "commandName": "Project",
       "launchBrowser": false,
-      //"launchUrl": "Buildings",
+      //"launchUrl": "WeatherForecast",
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

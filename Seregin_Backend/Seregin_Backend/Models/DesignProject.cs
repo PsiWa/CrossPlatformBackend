@@ -11,8 +11,10 @@ namespace Seregin_Backend.Models
         public int DesignProjectID { get; set; }
         public int AptID { get; set; }
         public int UserID { get; set; }
+        public string Photo { get; set; }
         public User Usr { get; set; }
         [JsonIgnore]
         public Apartment Apt { get; set; }
+
     }
 }

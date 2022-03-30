@@ -28,6 +28,22 @@ namespace Seregin_Backend.Controllers
             return await _context.Buildings.ToListAsync();
         }
 
+        // GET: api/Buildings/byUser/5
+        [HttpGet("byUser/{user_id}")]
+        public async Task<ActionResult> GetBuildingsByUserId(int user_id)
+        {
+            var user = await _context.Users
+                .Include(u=>u.Projects)
+                .ThenInclude(p=>p.Apt)
+                .FirstOrDefaultAsync(u=>u.UserID==user_id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user.Projects.Select(p=>p.Apt.ToString()));
+        }
         // GET: api/Buildings/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Building>> GetBuilding(int id)

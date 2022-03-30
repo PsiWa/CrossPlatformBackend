@@ -12,10 +12,14 @@ namespace Seregin_Backend.Data
         public BuildingContext(DbContextOptions<BuildingContext> options)
             : base(options)
         {
+            Database.Migrate();
         }
 
         public DbSet<Building> Buildings { get; set; }
         public DbSet<Apartment> Apartments { get; set; }
+        public DbSet<DesignProject> DesignProjects { get; set; }
+        public DbSet<User> Users { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Building>().ToTable("Building");
@@ -38,7 +42,6 @@ namespace Seregin_Backend.Data
             .WithMany(b => b.Projects)
             .HasForeignKey(p => p.UserID);
 
-            
         }
     }
 }

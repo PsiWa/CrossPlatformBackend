@@ -19,5 +19,10 @@ namespace Seregin_Backend.Models
         public ICollection<DesignProject> ProjectsForApt { get; set; }
         [JsonIgnore]
         public Building Bldng { get; set; }
+
+        public override string ToString()
+        {
+            return $" Apartment {RoomsN} rooms ({GeneralArea} m^2)";
+        }
     }
 }
