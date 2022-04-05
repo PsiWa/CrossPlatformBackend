@@ -16,5 +16,12 @@ namespace Seregin_Backend.Models
         public string Review { get; set; }
 
         public ICollection<Apartment> Apts { get; set; }
+        public string GetInfo()
+        {
+            string AptTypes= "\n";
+            foreach (Apartment apt in Apts)
+                AptTypes = AptTypes+apt.ToString()+"\n";
+            return $" Building {CodeName} with {Apts.Count()} apartment options:" + AptTypes;
+        }
     }
 }

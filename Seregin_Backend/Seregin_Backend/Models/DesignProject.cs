@@ -16,5 +16,9 @@ namespace Seregin_Backend.Models
         [JsonIgnore]
         public Apartment Apt { get; set; }
 
+        public override string ToString()
+        {
+            return $"{DesignProjectID} by {Usr.UName} for {Apt.Bldng.CodeName} ({Apt.RoomsN} rooms)";
+        }
     }
 }

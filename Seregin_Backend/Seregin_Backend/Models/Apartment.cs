@@ -22,7 +22,7 @@ namespace Seregin_Backend.Models
 
         public override string ToString()
         {
-            return $" Apartment {RoomsN} rooms ({GeneralArea} m^2)";
+            return $" Apartment {RoomsN} rooms, {GeneralArea} m^2 (There are {ProjectsForApt.Count()} projrects)";
         }
     }
 }

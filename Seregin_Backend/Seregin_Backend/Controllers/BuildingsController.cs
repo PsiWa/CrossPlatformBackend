@@ -58,7 +58,7 @@ namespace Seregin_Backend.Controllers
             return building;
         }
 
-        [HttpGet("test/{id}")]
+        [HttpGet("BuildingInfo/{id}")]
         public async Task<ActionResult<Building>> OnGetAsync(int? id)
         {
             if (id == null)
@@ -71,6 +71,21 @@ namespace Seregin_Backend.Controllers
                 .ThenInclude(u => u.Usr)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.BuildingID == id);
+        }
+
+        [HttpGet("BuildingInfoApartments/{id}")]
+        public async Task<ActionResult<Building>> ApartmentsInBuilding(int id)
+        {
+            var building = await _context.Buildings
+                .Include(a => a.Apts)
+                .ThenInclude(p => p.ProjectsForApt)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.BuildingID == id);
+            if (building == null)
+            {
+                return NotFound();
+            }
+            return Ok(building.GetInfo());
         }
 
         // PUT: api/Buildings/5
@@ -108,20 +123,43 @@ namespace Seregin_Backend.Controllers
         // POST: api/Buildings
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [HttpPost("Apartment/{building_id}")]
+        public async Task<ActionResult<Building>> PostApartment(int building_id,Apartment apartment)
+        {
+            var building = await _context.Buildings.Include(a => a.Apts).FirstOrDefaultAsync(m => m.BuildingID == building_id);
+            if (building == null)
+            {
+                return NotFound();
+            }
+            apartment.InBldngID = building.BuildingID;
+            apartment.Bldng = building;
+            _context.Apartments.Add(apartment);
+            building.Apts.Add(apartment);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetBuilding", new { id = building.BuildingID }, building);
+        }
+
         [HttpPost]
         public async Task<ActionResult<Building>> PostBuilding(Building building)
         {
+            if (building == null)
+            {
+                return NotFound();
+            }
             _context.Buildings.Add(building);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetBuilding", new { id = building.BuildingID }, building);
         }
 
+        
+
         // DELETE: api/Buildings/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<Building>> DeleteBuilding(int id)
         {
-            var building = await _context.Buildings.FindAsync(id);
+            var building = await _context.Buildings.Include(a => a.Apts).FirstOrDefaultAsync(m => m.BuildingID == id);
             if (building == null)
             {
                 return NotFound();
@@ -132,6 +170,7 @@ namespace Seregin_Backend.Controllers
 
             return building;
         }
+
 
         private bool BuildingExists(int id)
         {
