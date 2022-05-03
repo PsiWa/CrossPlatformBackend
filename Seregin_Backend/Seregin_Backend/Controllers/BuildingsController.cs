@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Seregin_Backend.Data;
 using Seregin_Backend.Models;
 
@@ -29,20 +35,20 @@ namespace Seregin_Backend.Controllers
         }
 
         // GET: api/Buildings/byUser/5
-        [HttpGet("byUser/{user_id}")]
+        [HttpGet("byUser/{user_id}"), Authorize(Roles = "Admin")]
         public async Task<ActionResult> GetBuildingsByUserId(int user_id)
         {
             var user = await _context.Users
-                .Include(u=>u.Projects)
-                .ThenInclude(p=>p.Apt)
-                .FirstOrDefaultAsync(u=>u.UserID==user_id);
+                .Include(u => u.Projects)
+                .ThenInclude(p => p.Apt)
+                .FirstOrDefaultAsync(u => u.UserID == user_id);
 
             if (user == null)
             {
                 return NotFound();
             }
 
-            return Ok(user.Projects.Select(p=>p.Apt.ToString()));
+            return Ok(user);
         }
         // GET: api/Buildings/5
         [HttpGet("{id}")]
@@ -91,7 +97,7 @@ namespace Seregin_Backend.Controllers
         // PUT: api/Buildings/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutBuilding(int id, Building building)
         {
             if (id != building.BuildingID)
@@ -123,7 +129,7 @@ namespace Seregin_Backend.Controllers
         // POST: api/Buildings
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost("Apartment/{building_id}")]
+        [HttpPost("Apartment/{building_id}"), Authorize(Roles = "Admin")]
         public async Task<ActionResult<Building>> PostApartment(int building_id,Apartment apartment)
         {
             var building = await _context.Buildings.Include(a => a.Apts).FirstOrDefaultAsync(m => m.BuildingID == building_id);
@@ -140,7 +146,7 @@ namespace Seregin_Backend.Controllers
             return CreatedAtAction("GetBuilding", new { id = building.BuildingID }, building);
         }
 
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "Admin")]
         public async Task<ActionResult<Building>> PostBuilding(Building building)
         {
             if (building == null)
@@ -156,7 +162,7 @@ namespace Seregin_Backend.Controllers
         
 
         // DELETE: api/Buildings/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize(Roles = "Admin")]
         public async Task<ActionResult<Building>> DeleteBuilding(int id)
         {
             var building = await _context.Buildings.Include(a => a.Apts).FirstOrDefaultAsync(m => m.BuildingID == id);

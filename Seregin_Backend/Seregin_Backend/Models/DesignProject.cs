@@ -18,7 +18,7 @@ namespace Seregin_Backend.Models
 
         public override string ToString()
         {
-            return $"{DesignProjectID} by {Usr.UName} for {Apt.Bldng.CodeName} ({Apt.RoomsN} rooms)";
+            return $"{DesignProjectID}ID by {Usr.UName} for {Apt.Bldng.CodeName} ({Apt.RoomsN} rooms)";
         }
     }
 }

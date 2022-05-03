@@ -12,11 +12,16 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Seregin_Backend.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Seregin_Backend
 {
     public class Startup
     {
+        private const bool V = false;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -30,6 +35,18 @@ namespace Seregin_Backend
             services.AddControllers();
             services.AddDbContext<BuildingContext>(opt =>
                opt.UseSqlServer(Configuration.GetConnectionString("BuildingContext")));
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding
+                    .UTF8.GetBytes(Configuration.GetSection("AppSettings:Token").Value)),
+
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,12 +61,15 @@ namespace Seregin_Backend
 
             app.UseRouting();
 
+            app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+
         }
     }
 }
