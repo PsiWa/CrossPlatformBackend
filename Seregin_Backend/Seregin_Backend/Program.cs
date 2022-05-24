@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Seregin_Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-
+using System.Net;
 
 namespace Seregin_Backend
 {
@@ -25,6 +25,13 @@ namespace Seregin_Backend
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseKestrel(opts =>
+                    {
+                        opts.Listen(IPAddress.Loopback, port: 5003, opts => opts.UseHttps());
+                        opts.ListenAnyIP(5002, opts => opts.UseHttps());
+                        opts.ListenLocalhost(5000);
+                        opts.ListenLocalhost(5001, opts => opts.UseHttps());
+                    });
                 });
     }
 }
